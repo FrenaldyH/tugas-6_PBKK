@@ -24,13 +24,16 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
-        $name = fake()->name();
-        // Unique ITS student number (NRP) keeps every email unique across the seed run.
-        $nrp = fake()->unique()->numerify('502522####');
+        // ITS student number: 5025 (Informatics) + 2-digit intake year + 4 digits.
+        // Intake 2021-2023 only, so a fake student can never collide with a real 2024 NRP.
+        $year = fake()->randomElement(['21', '22', '23']);
+        // ponytail: unique() only holds within one run; a second db:seed without fresh has a ~0.75%
+        // chance of reusing an NRP. migrate:fresh --seed is always safe.
+        $nrp = fake()->unique()->numerify("5025{$year}####");
 
         return [
-            'name' => $name,
-            'email' => Str::slug($name, '.').".{$nrp}@student.its.ac.id",
+            'name' => fake()->name(),
+            'email' => "{$nrp}@student.its.ac.id",
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),

@@ -4,9 +4,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Root goes straight to the portal; guests are bounced to /login by the auth middleware.
+Route::redirect('/', '/dashboard');
 
 // Profile dashboard, only reachable after login.
 Route::get('/dashboard', DashboardController::class)

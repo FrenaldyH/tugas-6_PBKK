@@ -3,10 +3,12 @@
 Portal portofolio akademik (Laravel 12 + Breeze) yang menyimpan profil mahasiswa dan proposal ide
 proyek **Agentic AI** di MySQL.
 
-- `users` — tabel bawaan Breeze, email `unique()`.
-- `projects` — `judul`, `deskripsi` (nullable), `tema_agent` (default `Ollama`), `api_key_secure` (terenkripsi),
-  `user_id` → `users.id` dengan `ON DELETE CASCADE`.
-- Dashboard menampilkan hanya project milik user yang login, terurut terbaru.
+- `users` — tabel bawaan Breeze (kredensial login), email `unique()`.
+- `profiles` — biodata akademik (NRP unik, departemen, angkatan, bio, keahlian), satu per user.
+- `assignments` — riwayat tugas kuliah.
+- `projects` — `judul`, `deskripsi` (nullable), `tema_agent` (default `Ollama`), `api_key_secure` (terenkripsi).
+- Semua tabel anak terikat ke `users.id` dengan `ON DELETE CASCADE`.
+- Dashboard menampilkan hanya profil, riwayat tugas, dan project milik user yang login, terurut terbaru.
 
 ## Setup database lokal
 
@@ -28,11 +30,13 @@ Reset ulang database kapan saja: `php artisan migrate:fresh --seed`.
 
 ## Akun demo
 
-| Email                 | Password   |
-|-----------------------|------------|
-| `dosenpbkk@its.ac.id` | `password` |
 
-Semua akun mahasiswa hasil seeder juga memakai password `password`.
+| Akun                  | Email                          | Password   |
+| --------------------- | ------------------------------ | ---------- |
+| Demo penguji (dosen)  | `dosenpbkk@its.ac.id`          | `password` |
+| Pemilik portofolio    | `5025241156@student.its.ac.id` | `password` |
+
+15 akun mahasiswa acak hasil seeder juga memakai password `password`.
 
 ## Pengujian & standar kode
 

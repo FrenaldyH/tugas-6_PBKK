@@ -8,9 +8,9 @@ use Illuminate\View\View;
 class DashboardController extends Controller
 {
     /**
-     * Profile dashboard: show only the projects owned by the logged-in user, newest first.
-     * Going through the relation adds "WHERE user_id = ?" with a bound parameter,
-     * so the query is scoped to the owner and safe from SQL injection.
+     * Profile dashboard: the logged-in user's biodata, assignment history and projects.
+     * Every query goes through the user's relations, which add "WHERE user_id = ?" with a bound
+     * parameter, so it is scoped to the owner and safe from SQL injection.
      */
     public function __invoke(Request $request): View
     {
@@ -18,6 +18,9 @@ class DashboardController extends Controller
 
         return view('dashboard', [
             'user' => $user,
+            'profile' => $user->profile,
+            // Newest submission first; in-progress items (NULL date) sort last.
+            'assignments' => $user->assignments()->orderByDesc('dikumpulkan_pada')->latest()->get(),
             'projects' => $user->projects()->latest()->get(),
         ]);
     }

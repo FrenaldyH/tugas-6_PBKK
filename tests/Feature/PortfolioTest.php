@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Assignment;
 use App\Models\Profile;
 use App\Models\User;
+use Database\Seeders\PortfolioAccountSeeder;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -38,6 +39,23 @@ class PortfolioTest extends TestCase
 
         $this->expectException(QueryException::class);
         $profile->user->profile()->create(['nrp' => '5025999999', 'angkatan' => 2099]);
+    }
+
+    // Every group member gets their own TokenPilot copy, and re-seeding adds no duplicates.
+    public function test_group_seeder_gives_each_member_tokenpilot_and_is_idempotent(): void
+    {
+        $this->seed(PortfolioAccountSeeder::class);
+        $this->seed(PortfolioAccountSeeder::class);
+
+        $members = User::where('email', 'like', '%@student.its.ac.id')->with('profile', 'projects')->get();
+
+        $this->assertCount(6, $members);
+        foreach ($members as $member) {
+            $this->assertSame($member->profile->nrp.'@student.its.ac.id', $member->email);
+            $this->assertSame(['TokenPilot - Agent Pengatur Konteks untuk AI Coding'], $member->projects->pluck('judul')->all());
+        }
+        $this->assertDatabaseCount('users', 7); // 6 members + lecturer demo account
+        $this->assertDatabaseCount('projects', 6 + 3);
     }
 
     // Deleting a user removes their profile and assignment history too (cascade).

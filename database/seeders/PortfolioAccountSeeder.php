@@ -7,44 +7,73 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
 /**
- * Hand-written accounts with a complete, ready-to-present portfolio.
+ * Hand-written accounts with a complete, ready-to-present portfolio:
+ * every member of Kelompok 1 plus the lecturer's demo account.
  * Every write is an updateOrCreate / firstOrCreate, so running db:seed again never duplicates rows.
  */
 class PortfolioAccountSeeder extends Seeder
 {
-    /**
-     * Seed the portal owner's real portfolio and the lecturer's demo account.
-     */
-    public function run(): void
-    {
-        $this->seedOwner();
-        $this->seedDemo();
-    }
+    // The group's shared Agentic AI proposal; every member owns their own copy (projects.user_id is required).
+    private const TOKENPILOT = [
+        'judul' => 'TokenPilot - Agent Pengatur Konteks untuk AI Coding',
+        'deskripsi' => 'Website Laravel untuk memberi tugas coding. Di belakangnya, agent (local LLM via Ollama) '
+            .'memilih file dan catatan lama yang relevan, mengirim instruksi ke coding AI (Codex/Claude), '
+            .'menjalankan test, lalu memutuskan mencoba lagi atau berhenti. Target: penggunaan token lebih '
+            .'efisien tanpa menurunkan keberhasilan tugas.',
+        'tema_agent' => 'Ollama',
+    ];
 
-    /**
-     * The portal owner: data moved out of the static profile page of last week's assignment.
-     */
-    private function seedOwner(): void
-    {
-        $this->seedPortfolio(
-            $this->account('5025241156@student.its.ac.id', 'Frenaldy Bestabba Hasugian'),
-            profile: [
-                'nrp' => '5025241156',
-                'departemen' => 'Teknik Informatika',
-                'angkatan' => 2024,
-                'bio' => 'Mahasiswa Teknik Informatika ITS angkatan 2024. Sedang merancang TokenPilot, '
-                    .'agent yang membantu AI coding bekerja lebih terarah dan hemat token.',
-                'github' => 'https://github.com/FrenaldyH',
-                'linkedin' => 'https://linkedin.com/in/frenaldyh',
-                'keahlian' => ['PHP', 'Laravel', 'JavaScript', 'Tailwind CSS', 'MySQL', 'Git'],
-            ],
-            assignments: [
-                [
-                    'judul' => 'Tugas 1 - Sistem Informasi Statik Profil Kelompok',
-                    'deskripsi' => 'Website profil akademik enam anggota Kelompok 1 dengan Laravel, Bootstrap 5, dan Vite.',
-                    'link_repo' => 'https://github.com/PBKK-B1/sistem-informasi-statistik-profil',
-                    'dikumpulkan_pada' => '2026-09-08',
-                ],
+    // Group assignments every member worked on.
+    private const GROUP_ASSIGNMENTS = [
+        [
+            'judul' => 'Tugas 1 - Sistem Informasi Statik Profil Kelompok',
+            'deskripsi' => 'Website profil akademik enam anggota Kelompok 1 dengan Laravel, Bootstrap 5, dan Vite.',
+            'link_repo' => 'https://github.com/PBKK-B1/sistem-informasi-statistik-profil',
+            'dikumpulkan_pada' => '2026-09-08',
+        ],
+        [
+            'judul' => 'Tugas 6 - Secure Academic Portal Database',
+            'deskripsi' => 'Migration, relasi, $fillable, factory, dan seeder portal portofolio kelompok di MySQL.',
+            'link_repo' => null,
+            'dikumpulkan_pada' => null, // still in progress
+        ],
+    ];
+
+    // Kelompok 1 members; biodata taken from the group's Tugas 1 profile page.
+    private const MEMBERS = [
+        [
+            'name' => 'Mitra Partogi',
+            'nrp' => '5025241017',
+            'bio' => 'Saya adalah mahasiswa semester 5 Program Studi Teknik Informatika ITS yang tertarik menjadi '
+                .'programmer andal di bidang pemrograman kompetitif dan sains data.',
+            'linkedin' => 'http://www.linkedin.com/in/mitra-partogi',
+            'keahlian' => ['C/C++', 'Python', 'HTML', 'TypeScript', 'Next.js', 'React', 'Microsoft Office', 'Google Spreadsheets'],
+        ],
+        [
+            'name' => 'Dimas Setiaji',
+            'nrp' => '5025241056',
+            'bio' => 'Motivated to contribute to interactive projects and continuously improving technical and creative skills.',
+            'linkedin' => 'https://www.linkedin.com/in/dimas-setiaji-596b33335/',
+            'keahlian' => ['C', 'C++', 'C#', 'HTML', 'CSS', 'UI/UX Design', 'Figma', 'Game Mechanics Design'],
+        ],
+        [
+            'name' => 'Steven Alvin Christian',
+            'nrp' => '5025241116',
+            'bio' => 'Mahasiswa Teknik Informatika ITS yang tertarik pada bidang Data Science, Artificial Intelligence, '
+                .'dan Machine Learning.',
+            'linkedin' => 'http://www.linkedin.com/in/stevenalvinchristian',
+            'keahlian' => ['Python', 'C/C++', 'SQL', 'Tableau', 'Microsoft Office'],
+        ],
+        [
+            'name' => 'Frenaldy Bestabba Hasugian',
+            'nrp' => '5025241156',
+            'bio' => 'Mahasiswa Teknik Informatika ITS angkatan 2024. Sedang merancang TokenPilot, '
+                .'agent yang membantu AI coding bekerja lebih terarah dan hemat token.',
+            'github' => 'https://github.com/FrenaldyH',
+            'linkedin' => 'https://linkedin.com/in/frenaldyh',
+            'keahlian' => ['PHP', 'Laravel', 'JavaScript', 'Tailwind CSS', 'MySQL', 'Git'],
+            // Individual assignments, on top of the group ones.
+            'assignments' => [
                 [
                     'judul' => 'Tugas 2 - Profil Akademis ITS',
                     'deskripsi' => 'Aplikasi profil akademis statis dengan fokus pada routing Laravel.',
@@ -63,24 +92,49 @@ class PortfolioAccountSeeder extends Seeder
                     'link_repo' => 'https://github.com/FrenaldyH/tugas-microservices-pbkk',
                     'dikumpulkan_pada' => '2026-09-27',
                 ],
-                [
-                    'judul' => 'Tugas 6 - Secure Academic Portal Database',
-                    'deskripsi' => 'Migration, relasi, $fillable, factory, dan seeder portal portofolio di MySQL.',
-                    'link_repo' => null,
-                    'dikumpulkan_pada' => null, // still in progress
-                ],
             ],
-            projects: [
-                [
-                    'judul' => 'TokenPilot - Agent Pengatur Konteks untuk AI Coding',
-                    'deskripsi' => 'Website Laravel untuk memberi tugas coding. Di belakangnya, agent (local LLM via Ollama) '
-                        .'memilih file dan catatan lama yang relevan, mengirim instruksi ke coding AI (Codex/Claude), '
-                        .'menjalankan test, lalu memutuskan mencoba lagi atau berhenti. Target: penggunaan token lebih '
-                        .'efisien tanpa menurunkan keberhasilan tugas.',
-                    'tema_agent' => 'Ollama',
+        ],
+        [
+            'name' => 'Hoshida Ahmad Tsalatsu Fadlulloh',
+            'nrp' => '5025241174',
+            'bio' => 'Saya Adalah Mahasiswa Semester 5 Program Studi Teknik Informatika ITS yang tertarik di bidang '
+                .'Game Development',
+            'linkedin' => 'https://www.linkedin.com/in/hoshida-ahmad-tsalatsu-fadlulloh-328167323/',
+            'keahlian' => ['C/C++', 'SQL', 'Canva', 'Microsoft Excel'],
+        ],
+        [
+            'name' => 'Isabella Sienna Sulisthio',
+            'nrp' => '5025241199',
+            'bio' => 'Saya adalah mahasiswa semester 5 Program Studi Teknik Informatika ITS yang tertarik di bidang AI '
+                .'khususnya Computer Vision.',
+            'linkedin' => 'https://www.linkedin.com/in/isabellasienna',
+            'keahlian' => ['C', 'C++', 'SQL', 'Python', 'Web Programming', 'Figma', 'Canva', 'Microsoft Office'],
+        ],
+    ];
+
+    /**
+     * Seed every group member's portfolio, then the lecturer's demo account.
+     */
+    public function run(): void
+    {
+        foreach (self::MEMBERS as $member) {
+            $this->seedPortfolio(
+                $this->account("{$member['nrp']}@student.its.ac.id", $member['name']),
+                profile: [
+                    'nrp' => $member['nrp'],
+                    'departemen' => 'Teknik Informatika',
+                    'angkatan' => 2000 + (int) substr($member['nrp'], 4, 2),
+                    'bio' => $member['bio'],
+                    'github' => $member['github'] ?? null,
+                    'linkedin' => $member['linkedin'],
+                    'keahlian' => $member['keahlian'],
                 ],
-            ],
-        );
+                assignments: [...self::GROUP_ASSIGNMENTS, ...($member['assignments'] ?? [])],
+                projects: [self::TOKENPILOT],
+            );
+        }
+
+        $this->seedDemo();
     }
 
     /**
